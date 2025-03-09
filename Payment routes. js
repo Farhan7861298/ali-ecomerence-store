@@ -1,0 +1,38 @@
+import express from "express";
+import axios from "axios";
+
+const router = express.Router();
+
+// JazzCash Payment Request
+router.post("/jazzcash", async (req, res) => {
+  const { amount, phoneNumber } = req.body;
+
+  try {
+    const response = await axios.post("https://sandbox.jazzcash.com.pk/api/payment", {
+      amount,
+      phoneNumber,
+    });
+
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ message: "Payment failed" });
+  }
+});
+
+// PayPal Payment Request
+router.post("/paypal", async (req, res) => {
+  const { amount } = req.body;
+
+  try {
+    const response = await axios.post("https://api-m.paypal.com/v2/checkout/orders", {
+      intent: "CAPTURE",
+      purchase_units: [{ amount: { value: amount } }],
+    });
+
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ message: "Payment failed" });
+  }
+});
+
+export default router;
